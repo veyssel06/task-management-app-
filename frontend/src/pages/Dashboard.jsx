@@ -35,7 +35,7 @@ function Dashboard() {
       <Navbar />
       <div className="p-8">
         <h1 className="text-3xl font-bold mb-8">Task Board</h1>
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {columns.map((col) => (
             <div key={col.id} className="bg-white rounded-lg p-4 shadow">
               <h2 className="text-lg font-semibold mb-4">{col.title}</h2>
