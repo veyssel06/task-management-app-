@@ -1,2 +1,9 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
+/* index.css */
+@layer base {
+  .dark input::placeholder {
+    color: #9ca3af; /* Tailwind'in gray-400 rengine denk gelir, okunurluğu artırır */
+    opacity: 0.8;
+  }
+}

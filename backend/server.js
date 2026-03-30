@@ -14,6 +14,7 @@ app.use(express.json())
 // Routes
 app.use('/api/auth', require('./routes/auth'))
 app.use('/api/tasks', authMiddleware, require('./routes/tasks'))
+app.use('/api/user', authMiddleware, require('./routes/user'))
 
 // Ana sayfa
 app.get('/', (req, res) => {
