@@ -57,6 +57,24 @@ function Dashboard() {
                       'bg-green-100 text-green-600'}`}>
                     {task.priority}
                   </span>
+                  <div className="flex gap-1 mt-2">
+                {columns
+                    .filter((c) => c.id !== task.status)
+                    .map((c) => (
+                    <button
+                        key={c.id}
+                        onClick={async () => {
+                        await api.put(`/tasks/${task._id}`, { status: c.id })
+                        setTasks(tasks.map((t) =>
+                            t._id === task._id ? { ...t, status: c.id } : t
+                        ))
+                        }}
+                        className="text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded"
+                    >
+                        → {c.title}
+                    </button>
+                    ))}
+                </div>
                 </div>
               ))}
 
