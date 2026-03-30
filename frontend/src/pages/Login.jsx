@@ -9,11 +9,16 @@ function Login() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault()
+    
+    if (!email || !password) {
+      setError('Email ve şifre alanları boş bırakılamaz!')
+      return
+    }
+
     setLoading(true)
     setError('')
-
     try {
       const response = await api.post('/auth/login', { email, password })
       localStorage.setItem('token', response.data.token)

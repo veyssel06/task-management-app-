@@ -1,19 +1,46 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import api from '../services/api'
 
 function Register() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log(name, email, password)
+    
+    if (!name || !email || !password) {
+      setError('Tüm alanları doldurunuz!')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+
+    try {
+      await api.post('/auth/register', { name, email, password })
+      navigate('/login')
+    } catch (err) {
+      setError('Kayıt olurken bir hata oluştu!')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg shadow-md w-96">
         <h1 className="text-2xl font-bold text-center mb-6">Kayıt Ol</h1>
+
+        {error && (
+          <div className="bg-red-100 text-red-600 p-3 rounded-lg mb-4">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -51,9 +78,10 @@ function Register() {
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
+            disabled={loading}
+            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
           >
-            Kayıt Ol
+            {loading ? 'Kayıt olunuyor...' : 'Kayıt Ol'}
           </button>
         </form>
 
