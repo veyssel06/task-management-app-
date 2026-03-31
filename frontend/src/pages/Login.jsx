@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
 
-
 function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -79,6 +78,11 @@ function Login() {
                 >
                   {showPassword ? '🙈' : '👁️'}
                 </button>
+              </div>
+              <div className="text-right mt-1">
+                <a href="#" className="text-sm text-violet-500 hover:underline">
+                  Şifremi unuttum?
+                </a>
               </div>
             </div>
 

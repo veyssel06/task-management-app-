@@ -1,57 +1,81 @@
-import { useNavigate, Link, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import Swal from 'sweetalert2'
 
 function Navbar() {
   const navigate = useNavigate()
   const location = useLocation()
-  
-  // 1. Başlangıç değerini LocalStorage'dan alıyoruz
-  const [dark, setDark] = useState(() => {
-    return localStorage.getItem('theme') === 'dark'
-  })
+  const [dark, setDark] = useState(false)
 
-  const isProfilePage = location.pathname === '/profile'
-
-  // 2. Tema değişimini hem HTML class'ına hem de LocalStorage'a işliyoruz
   useEffect(() => {
     if (dark) {
       document.documentElement.classList.add('dark')
-      localStorage.setItem('theme', 'dark')
     } else {
       document.documentElement.classList.remove('dark')
-      localStorage.setItem('theme', 'light')
     }
   }, [dark])
 
-  const handleLogout = () => {
-    localStorage.removeItem('token')
-    navigate('/login')
+  const handleLogout = async () => {
+    const result = await Swal.fire({
+      title: 'Çıkış yapmak istediğinize emin misiniz?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#7c3aed',
+      cancelButtonColor: '#d1d5db',
+      confirmButtonText: 'Evet, çıkış yap!',
+      cancelButtonText: 'İptal'
+    })
+
+    if (result.isConfirmed) {
+      localStorage.removeItem('token')
+      navigate('/login')
+    }
   }
 
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow px-8 py-4 flex justify-between items-center transition-colors duration-300">
-      <h1 className="text-xl font-bold text-blue-500">Task Manager</h1>
+    <nav className="bg-gradient-to-r from-violet-600 to-indigo-600 px-8 py-4 flex justify-between items-center shadow-lg">
+      <div
+        onClick={() => navigate('/dashboard')}
+        className="flex items-center gap-2 cursor-pointer"
+      >
+        <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+          <span className="text-violet-600 font-bold text-sm">T</span>
+        </div>
+        <h1 className="text-xl font-bold text-white">Task Manager</h1>
+      </div>
 
-      <div className="flex gap-3 items-center">
-        <Link
-          to={isProfilePage ? "/dashboard" : "/profile"}
-          className="bg-gray-200 dark:bg-gray-700 dark:text-white px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => navigate('/dashboard')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+            location.pathname === '/dashboard'
+              ? 'bg-white text-violet-600'
+              : 'text-white hover:bg-white/20'
+          }`}
         >
-          {isProfilePage ? '📊 Dashboard' : '👤 Profile'}
-        </Link>
-
+          📋 Board
+        </button>
+        <button
+          onClick={() => navigate('/profile')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+            location.pathname === '/profile'
+              ? 'bg-white text-violet-600'
+              : 'text-white hover:bg-white/20'
+          }`}
+        >
+          👤 Profil
+        </button>
         <button
           onClick={() => setDark(!dark)}
-          className="bg-gray-200 dark:bg-gray-700 dark:text-white px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+          className="w-9 h-9 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center transition"
         >
           {dark ? '☀️' : '🌙'}
         </button>
-
         <button
           onClick={handleLogout}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+          className="px-4 py-2 rounded-lg text-sm font-medium bg-white/20 text-white hover:bg-white/30 transition"
         >
-          Çıkış Yap
+          Çıkış →
         </button>
       </div>
     </nav>
