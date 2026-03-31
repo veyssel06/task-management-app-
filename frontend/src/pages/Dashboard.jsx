@@ -7,6 +7,8 @@ function Dashboard() {
   const [tasks, setTasks] = useState([])
   const [newTask, setNewTask] = useState({ title: '', description: '', priority: 'medium' })
   const [activeColumn, setActiveColumn] = useState(null)
+  const [search, setSearch] = useState('')
+  const [filterPriority, setFilterPriority] = useState('all')
 
   useEffect(() => {
     api.get('/tasks').then((res) => setTasks(res.data))
@@ -79,7 +81,26 @@ const handleDelete = async (id) => {
       <div className="p-8">
         {/* Başlık rengi dinamik yapıldı */}
         <h1 className="text-3xl font-bold mb-8 dark:text-white">Task Board</h1>
-        
+        <div className="flex gap-4 mb-6">
+        <input
+          type="text"
+          placeholder="🔍 Görev ara..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="flex-1 border border-gray-200 rounded-xl p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-white dark:bg-gray-800 dark:text-white dark:border-gray-600"
+        />
+        <select
+          value={filterPriority}
+          onChange={(e) => setFilterPriority(e.target.value)}
+          className="border border-gray-200 rounded-xl p-3 outline-none bg-white dark:bg-gray-800 dark:text-white dark:border-gray-600"
+        >
+          <option value="all">Tüm Öncelikler</option>
+          <option value="high">Yüksek</option>
+          <option value="medium">Orta</option>
+          <option value="low">Düşük</option>
+        </select>
+      </div>
+              
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {columns.map((col) => (
             // Kolon kartları dark:bg-gray-800 yapıldı
@@ -88,6 +109,8 @@ const handleDelete = async (id) => {
               
               {tasks
                 .filter((task) => task.status === col.id)
+                .filter((task) => task.title.toLowerCase().includes(search.toLowerCase()))
+                .filter((task) => filterPriority === 'all' || task.priority === filterPriority)
                 .map((task) => (
                   // Görev kartları dark:bg-gray-700 yapıldı
                   <div key={task._id} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mb-2 border dark:border-gray-600 shadow-sm">

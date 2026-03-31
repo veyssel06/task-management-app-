@@ -44,7 +44,7 @@ function Navbar() {
           onClick={() => setDark(!dark)}
           className="bg-gray-200 dark:bg-gray-700 dark:text-white px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
         >
-          {dark ? '☀️ LIGHT' : '🌙 DARK'}
+          {dark ? '☀️' : '🌙'}
         </button>
 
         <button
