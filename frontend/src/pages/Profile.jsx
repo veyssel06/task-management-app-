@@ -171,22 +171,22 @@ function Profile() {
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 mb-6 hover:shadow-lg transition">
           <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4">📊 İstatistikler</h3>
           <div className="grid grid-cols-4 gap-4 mb-6">
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 text-center">
-              <p className="text-3xl font-bold text-gray-800 dark:text-white">{stats.total}</p>
-              <p className="text-sm text-gray-500">Toplam</p>
-            </div>
-            <div className="bg-violet-50 dark:bg-violet-900 rounded-xl p-4 text-center">
-              <p className="text-3xl font-bold text-violet-500">{stats.todo}</p>
-              <p className="text-sm text-gray-500">Yapılacak</p>
-            </div>
-            <div className="bg-amber-50 dark:bg-amber-900 rounded-xl p-4 text-center">
-              <p className="text-3xl font-bold text-amber-500">{stats.inProgress}</p>
-              <p className="text-sm text-gray-500">Devam Ediyor</p>
-            </div>
-            <div className="bg-green-50 dark:bg-green-900 rounded-xl p-4 text-center">
-              <p className="text-3xl font-bold text-green-500">{stats.done}</p>
-              <p className="text-sm text-gray-500">Tamamlandı</p>
-            </div>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 text-center">
+            <p className="text-3xl font-bold text-gray-800 dark:text-white">{stats.total}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-300">Toplam</p>
+          </div>
+          <div className="bg-violet-50 dark:bg-violet-800 rounded-xl p-4 text-center">
+            <p className="text-3xl font-bold text-violet-500 dark:text-violet-200">{stats.todo}</p>
+            <p className="text-sm text-gray-500 dark:text-violet-200">Yapılacak</p>
+          </div>
+          <div className="bg-amber-50 dark:bg-amber-800 rounded-xl p-4 text-center">
+            <p className="text-3xl font-bold text-amber-500 dark:text-amber-200">{stats.inProgress}</p>
+            <p className="text-sm text-gray-500 dark:text-amber-200">Devam Ediyor</p>
+          </div>
+          <div className="bg-green-50 dark:bg-green-800 rounded-xl p-4 text-center">
+            <p className="text-3xl font-bold text-green-500 dark:text-green-200">{stats.done}</p>
+            <p className="text-sm text-gray-500 dark:text-green-200">Tamamlandı</p>
+          </div>
           </div>
 
           <div>

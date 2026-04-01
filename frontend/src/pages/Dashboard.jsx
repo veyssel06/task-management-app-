@@ -6,11 +6,12 @@ import confetti from 'canvas-confetti'
 
 function Dashboard() {
   const [tasks, setTasks] = useState([])
-  const [newTask, setNewTask] = useState({ title: '', description: '', priority: 'medium' })
+  const [newTask, setNewTask] = useState({ title: '', description: '', priority: 'medium', dueDate: '' })
   const [activeColumn, setActiveColumn] = useState(null)
   const [search, setSearch] = useState('')
   const [filterPriority, setFilterPriority] = useState('all')
   const [user, setUser] = useState(null)
+  const [editTask, setEditTask] = useState(null) // edit modalı için
 
   useEffect(() => {
     api.get('/tasks').then((res) => setTasks(res.data))
@@ -24,18 +25,14 @@ function Dashboard() {
   ]
 
   const fireConfetti = () => {
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 }
-    })
+    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } })
   }
 
   const handleAddTask = async (status) => {
     if (!newTask.title) return
     const res = await api.post('/tasks', { ...newTask, status })
     setTasks([...tasks, res.data])
-    setNewTask({ title: '', description: '', priority: 'medium' })
+    setNewTask({ title: '', description: '', priority: 'medium', dueDate: '' })
     setActiveColumn(null)
     if (status === 'done') fireConfetti()
   }
@@ -57,6 +54,47 @@ function Dashboard() {
     }
   }
 
+  const handleMoveTask = async (task, targetId) => {
+    const targetLabel = targetId === 'inProgress' ? 'Devam Ediyor' : 'Tamamlandı'
+    const result = await Swal.fire({
+      title: 'Görevi taşı',
+      text: `Bu görevi "${targetLabel}" sütununa taşımak istiyor musunuz?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#7c3aed',
+      cancelButtonColor: '#d1d5db',
+      confirmButtonText: 'Evet, taşı!',
+      cancelButtonText: 'İptal'
+    })
+    if (result.isConfirmed) {
+      await api.put(`/tasks/${task._id}`, { status: targetId })
+      setTasks(tasks.map((t) =>
+        t._id === task._id ? { ...t, status: targetId } : t
+      ))
+      if (targetId === 'done') fireConfetti()
+    }
+  }
+
+  const handleEditSave = async () => {
+    if (!editTask.title) return
+    const res = await api.put(`/tasks/${editTask._id}`, {
+      title: editTask.title,
+      description: editTask.description,
+      priority: editTask.priority,
+      dueDate: editTask.dueDate || null,
+    })
+    setTasks(tasks.map((t) => t._id === editTask._id ? res.data : t))
+    setEditTask(null)
+  }
+
+  const getNextStatus = (currentStatus) => {
+    if (currentStatus === 'todo') return 'inProgress'
+    if (currentStatus === 'inProgress') return 'done'
+    return null
+  }
+
+  const isDueExpired = (dueDate) => dueDate && new Date(dueDate) < new Date()
+
   const priorityConfig = {
     high: { label: 'Yüksek', class: 'bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-300' },
     medium: { label: 'Orta', class: 'bg-amber-100 text-amber-600 dark:bg-amber-900 dark:text-amber-300' },
@@ -71,6 +109,61 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
+
+      {/* ───── Edit Modalı ───── */}
+      {editTask && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={(e) => { if (e.target === e.currentTarget) setEditTask(null) }}
+        >
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-md shadow-xl">
+            <h2 className="text-lg font-bold text-gray-800 dark:text-white mb-4">✏️ Görevi Düzenle</h2>
+            <input
+              type="text"
+              placeholder="Görev başlığı"
+              value={editTask.title}
+              onChange={(e) => setEditTask({ ...editTask, title: e.target.value })}
+              className="w-full border border-gray-200 dark:border-gray-600 rounded-xl p-3 mb-3 text-sm outline-none focus:border-violet-500 bg-white dark:bg-gray-700 dark:text-white"
+            />
+            <input
+              type="text"
+              placeholder="Açıklama (opsiyonel)"
+              value={editTask.description || ''}
+              onChange={(e) => setEditTask({ ...editTask, description: e.target.value })}
+              className="w-full border border-gray-200 dark:border-gray-600 rounded-xl p-3 mb-3 text-sm outline-none focus:border-violet-500 bg-white dark:bg-gray-700 dark:text-white"
+            />
+            <select
+              value={editTask.priority}
+              onChange={(e) => setEditTask({ ...editTask, priority: e.target.value })}
+              className="w-full border border-gray-200 dark:border-gray-600 rounded-xl p-3 mb-3 text-sm outline-none bg-white dark:bg-gray-700 dark:text-white"
+            >
+              <option value="low">🟢 Düşük</option>
+              <option value="medium">🟡 Orta</option>
+              <option value="high">🔴 Yüksek</option>
+            </select>
+            <input
+              type="date"
+              value={editTask.dueDate ? editTask.dueDate.slice(0, 10) : ''}
+              onChange={(e) => setEditTask({ ...editTask, dueDate: e.target.value })}
+              className="w-full border border-gray-200 dark:border-gray-600 rounded-xl p-3 mb-4 text-sm outline-none focus:border-violet-500 bg-white dark:bg-gray-700 dark:text-white"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={handleEditSave}
+                className="flex-1 bg-violet-600 text-white py-2.5 rounded-xl text-sm font-medium hover:bg-violet-700 transition"
+              >
+                Kaydet
+              </button>
+              <button
+                onClick={() => setEditTask(null)}
+                className="flex-1 bg-gray-100 dark:bg-gray-700 dark:text-white text-gray-700 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-200 transition"
+              >
+                İptal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="p-8">
         {user && (
@@ -118,10 +211,10 @@ function Dashboard() {
           </select>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
           {columns.map((col) => (
-            <div key={col.id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden">
-              <div className={`bg-gradient-to-r ${col.color} p-4`}>
+            <div key={col.id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden flex flex-col min-h-[200px]">
+              <div className={`bg-gradient-to-r ${col.color} p-4 flex-shrink-0`}>
                 <div className="flex justify-between items-center">
                   <h2 className="text-lg font-bold text-white">{col.title}</h2>
                   <span className="bg-white/30 text-white text-sm px-2 py-1 rounded-full">
@@ -130,98 +223,112 @@ function Dashboard() {
                 </div>
               </div>
 
-              <div className="p-4">
-                {filteredTasks(col.id).map((task) => (
-                  <div
-                    key={task._id}
-                    className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-3 border border-gray-100 dark:border-gray-600 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <p className="font-semibold text-gray-800 dark:text-white">{task.title}</p>
-                      <button
-                        onClick={() => handleDelete(task._id)}
-                        className="text-gray-300 hover:text-red-500 transition ml-2"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                    {task.description && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{task.description}</p>
-                    )}
-                    <div className="flex justify-between items-center">
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${priorityConfig[task.priority].class}`}>
-                        {priorityConfig[task.priority].label}
-                      </span>
-                      <div className="flex gap-1">
-                        {columns
-                          .filter((c) => c.id !== task.status)
-                          .map((c) => (
-                            <button
-                              key={c.id}
-                              onClick={async () => {
-                                await api.put(`/tasks/${task._id}`, { status: c.id })
-                                setTasks(tasks.map((t) =>
-                                  t._id === task._id ? { ...t, status: c.id } : t
-                                ))
-                                if (c.id === 'done') fireConfetti()
-                              }}
-                              className="text-xs bg-gray-200 dark:bg-gray-600 dark:text-gray-300 hover:bg-violet-100 hover:text-violet-600 px-3 py-1 rounded-lg transition font-medium"
-                            >
-                              → {c.id === 'todo' ? 'Yapılacak' : c.id === 'inProgress' ? 'Devam' : 'Bitti'}
-                            </button>
-                          ))}
+              <div className="p-4 overflow-y-auto flex-1">
+                {filteredTasks(col.id).map((task) => {
+                  const nextStatus = getNextStatus(task.status)
+                  const expired = isDueExpired(task.dueDate)
+                  return (
+                    <div
+                      key={task._id}
+                      className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-3 border border-gray-100 dark:border-gray-600 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <p className="font-semibold text-gray-800 dark:text-white">{task.title}</p>
+                        <div className="flex gap-2 ml-2">
+                          <button
+                            onClick={() => setEditTask(task)}
+                            className="text-gray-300 hover:text-violet-500 transition text-sm"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() => handleDelete(task._id)}
+                            className="text-gray-300 hover:text-red-500 transition"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+                      {task.description && (
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{task.description}</p>
+                      )}
+                      {task.dueDate && (
+                        <p className={`text-xs mb-2 font-medium ${expired ? 'text-red-500' : 'text-gray-400'}`}>
+                          📅 {new Date(task.dueDate).toLocaleDateString('tr-TR')} {expired && '· Süresi doldu!'}
+                        </p>
+                      )}
+                      <div className="flex justify-between items-center">
+                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${priorityConfig[task.priority].class}`}>
+                          {priorityConfig[task.priority].label}
+                        </span>
+                        {nextStatus && (
+                          <button
+                            onClick={() => handleMoveTask(task, nextStatus)}
+                            className="text-xs bg-gray-200 dark:bg-gray-600 dark:text-gray-300 hover:bg-violet-100 hover:text-violet-600 px-3 py-1 rounded-lg transition font-medium"
+                          >
+                            → {nextStatus === 'inProgress' ? 'Devam' : 'Bitti'}
+                          </button>
+                        )}
                       </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
 
-                {activeColumn === col.id ? (
-                  <div className="mt-2 bg-gray-50 dark:bg-gray-700 rounded-xl p-3">
-                    <input
-                      type="text"
-                      placeholder="Görev başlığı"
-                      value={newTask.title}
-                      onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-                      className="w-full border border-gray-200 dark:border-gray-600 rounded-lg p-2 mb-2 text-sm outline-none focus:border-violet-500 bg-white dark:bg-gray-800 dark:text-white"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Açıklama (opsiyonel)"
-                      value={newTask.description}
-                      onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-                      className="w-full border border-gray-200 dark:border-gray-600 rounded-lg p-2 mb-2 text-sm outline-none focus:border-violet-500 bg-white dark:bg-gray-800 dark:text-white"
-                    />
-                    <select
-                      value={newTask.priority}
-                      onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
-                      className="w-full border border-gray-200 dark:border-gray-600 rounded-lg p-2 mb-2 text-sm outline-none bg-white dark:bg-gray-800 dark:text-white"
-                    >
-                      <option value="low">🟢 Düşük</option>
-                      <option value="medium">🟡 Orta</option>
-                      <option value="high">🔴 Yüksek</option>
-                    </select>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleAddTask(col.id)}
-                        className="flex-1 bg-violet-500 text-white py-2 rounded-lg text-sm hover:bg-violet-600 transition"
+                {col.id === 'todo' && (
+                  activeColumn === col.id ? (
+                    <div className="mt-2 bg-gray-50 dark:bg-gray-700 rounded-xl p-3">
+                      <input
+                        type="text"
+                        placeholder="Görev başlığı"
+                        value={newTask.title}
+                        onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                        className="w-full border border-gray-200 dark:border-gray-600 rounded-lg p-2 mb-2 text-sm outline-none focus:border-violet-500 bg-white dark:bg-gray-800 dark:text-white"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Açıklama (opsiyonel)"
+                        value={newTask.description}
+                        onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                        className="w-full border border-gray-200 dark:border-gray-600 rounded-lg p-2 mb-2 text-sm outline-none focus:border-violet-500 bg-white dark:bg-gray-800 dark:text-white"
+                      />
+                      <select
+                        value={newTask.priority}
+                        onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
+                        className="w-full border border-gray-200 dark:border-gray-600 rounded-lg p-2 mb-2 text-sm outline-none bg-white dark:bg-gray-800 dark:text-white"
                       >
-                        Ekle
-                      </button>
-                      <button
-                        onClick={() => setActiveColumn(null)}
-                        className="flex-1 bg-gray-200 dark:bg-gray-600 dark:text-white py-2 rounded-lg text-sm hover:bg-gray-300 transition"
-                      >
-                        İptal
-                      </button>
+                        <option value="low">🟢 Düşük</option>
+                        <option value="medium">🟡 Orta</option>
+                        <option value="high">🔴 Yüksek</option>
+                      </select>
+                      <input
+                        type="date"
+                        value={newTask.dueDate}
+                        onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
+                        className="w-full border border-gray-200 dark:border-gray-600 rounded-lg p-2 mb-2 text-sm outline-none focus:border-violet-500 bg-white dark:bg-gray-800 dark:text-white"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleAddTask(col.id)}
+                          className="flex-1 bg-violet-500 text-white py-2 rounded-lg text-sm hover:bg-violet-600 transition"
+                        >
+                          Ekle
+                        </button>
+                        <button
+                          onClick={() => setActiveColumn(null)}
+                          className="flex-1 bg-gray-200 dark:bg-gray-600 dark:text-white py-2 rounded-lg text-sm hover:bg-gray-300 transition"
+                        >
+                          İptal
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setActiveColumn(col.id)}
-                    className="w-full text-gray-400 hover:text-violet-500 text-sm mt-2 py-2 border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-xl hover:border-violet-300 transition"
-                  >
-                    + Görev Ekle
-                  </button>
+                  ) : (
+                    <button
+                      onClick={() => setActiveColumn(col.id)}
+                      className="w-full text-gray-400 hover:text-violet-500 text-sm mt-2 py-2 border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-xl hover:border-violet-300 transition"
+                    >
+                      + Görev Ekle
+                    </button>
+                  )
                 )}
               </div>
             </div>

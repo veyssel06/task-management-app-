@@ -10,7 +10,7 @@ const taskSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['todo', 'inProgress', 'done'],
+    enum: ['todo', 'inProgress', 'done', 'archived'],
     default: 'todo'
   },
   priority: {
@@ -22,6 +22,14 @@ const taskSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
+  },
+  completedAt: {
+    type: Date,
+    default: null
+  },
+  dueDate: {
+  type: Date,
+  default: null
   }
 }, { timestamps: true })
 
