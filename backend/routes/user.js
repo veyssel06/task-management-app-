@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs')
 const User = require('../models/User')
 const Task = require('../models/Task')
 
+
 // Profil bilgilerini getir
 router.get('/profile', async (req, res) => {
   try {
@@ -37,7 +38,16 @@ router.put('/profile', async (req, res) => {
     res.status(500).json({ message: 'Sunucu hatası', error: err.message })
   }
 })
-
+// Hesabı sil
+router.delete('/delete-account', async (req, res) => {
+  try {
+    await Task.deleteMany({ user: req.userId })
+    await User.findByIdAndDelete(req.userId)
+    res.json({ message: 'Hesap silindi' })
+  } catch (err) {
+    res.status(500).json({ message: 'Sunucu hatası', error: err.message })
+  }
+})
 // Şifre değiştir
 router.put('/change-password', async (req, res) => {
   try {
