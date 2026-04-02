@@ -17,6 +17,8 @@ app.use(express.json())
 app.use('/api/auth', require('./routes/auth'))
 app.use('/api/tasks', authMiddleware, require('./routes/tasks'))
 app.use('/api/user', authMiddleware, require('./routes/user'))
+const { router: adminRouter } = require('./routes/admin')
+app.use('/api/admin', adminRouter)
 
 // Ana sayfa
 app.get('/', (req, res) => {
@@ -53,6 +55,6 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB bağlantısı başarılı!'))
   .catch((err) => console.log('Bağlantı hatası:', err))
 
-app.listen(process.env.PORT, () => {
-  console.log(`Sunucu ${process.env.PORT} portunda çalışıyor`)
-})
+app.listen(process.env.PORT, '0.0.0.0', () => {
+  console.log(`Sunucu ${process.env.PORT} portunda çalışıyor ve dış bağlantılara açık!`);
+});

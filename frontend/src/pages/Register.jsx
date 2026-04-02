@@ -29,55 +29,55 @@ function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-500 rounded-2xl mb-4 shadow-lg">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-2xl mb-4 shadow-lg">
             <span className="text-3xl">✅</span>
           </div>
-          <h1 className="text-3xl font-bold text-gray-800">Task Manager</h1>
-          <p className="text-gray-500 mt-1">Görevlerini yönet, hedeflerine ulaş</p>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Task Manager</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Görevlerini yönet, hedeflerine ulaş</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Kayıt Ol</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">Kayıt Ol</h2>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl mb-4 text-sm">
-              ⚠️ {error}
+            <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-red-600 dark:text-red-400 p-3 rounded-xl mb-4 text-sm">
+              {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Ad Soyad</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ad Soyad</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+                className="w-full border border-gray-200 dark:border-gray-600 rounded-xl p-3 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 bg-white dark:bg-gray-700 dark:text-white transition"
                 placeholder="Adınız Soyadınız"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+                className="w-full border border-gray-200 dark:border-gray-600 rounded-xl p-3 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 bg-white dark:bg-gray-700 dark:text-white transition"
                 placeholder="email@example.com"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Şifre</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Şifre</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+                className="w-full border border-gray-200 dark:border-gray-600 rounded-xl p-3 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 bg-white dark:bg-gray-700 dark:text-white transition"
                 placeholder="••••••••"
               />
             </div>
@@ -85,16 +85,16 @@ function Register() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-500 text-white py-3 rounded-xl font-medium hover:bg-blue-600 transition disabled:opacity-50 shadow-md hover:shadow-lg"
+              className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white py-3 rounded-xl font-medium hover:opacity-90 transition disabled:opacity-50 shadow-md"
             >
-              {loading ? '⏳ Kayıt olunuyor...' : 'Kayıt Ol →'}
+              {loading ? 'Kayıt olunuyor...' : 'Kayıt Ol'}
             </button>
           </form>
 
-          <p className="text-center mt-6 text-gray-500 text-sm">
-            Hesabın var mı?{' '}
-            <a href="/login" className="text-blue-500 font-medium hover:underline">
-              Giriş Yap
+          <p className="text-center mt-6 text-gray-500 dark:text-gray-400 text-sm">
+            Hesabin var mi?{' '}
+            <a href="/login" className="text-violet-600 font-medium hover:underline">
+              Giris Yap
             </a>
           </p>
         </div>

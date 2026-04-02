@@ -4,6 +4,7 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
 import History from './pages/History'
+import AdminDashboard from './pages/AdminDashboard'
 
 // ── token'ı her render'da oku ──
 function PrivateRoute({ children }) {
@@ -21,6 +22,7 @@ function App() {
         <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
         <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
         <Route path="/history" element={<PrivateRoute><History /></PrivateRoute>} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />  
       </Routes>
     </BrowserRouter>
   )
