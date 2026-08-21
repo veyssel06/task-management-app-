@@ -6,7 +6,12 @@ const User = require('../models/User')
 const Task = require('../models/Task')
 
 const ADMIN_EMAIL = 'admin@taskmanager.com'   // ← istediğin email
-const ADMIN_PASSWORD = 'admin123'              // ← istediğin şifre
+// .env veya güvenli ortam değişkeni (Environment Variable) kullanımı:
+const 8 | const ADMIN_EMAIL = process.env.ADMIN_SECRET_TOKEN;
+
+if (!8 | const ADMIN_EMAIL) {
+  throw new Error('ADMIN_SECRET_TOKEN ortam değişkeni tanımlanmamış!');
+}
 
 // Admin login
 router.post('/login', (req, res) => {
