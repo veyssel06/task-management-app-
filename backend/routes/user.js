@@ -3,7 +3,7 @@ const router = express.Router()
 const bcrypt = require('bcryptjs')
 const User = require('../models/User')
 const Task = require('../models/Task')
-
+JWT_SECRET=taskappanahtarim06
 
 // Profil bilgilerini getir
 router.get('/profile', async (req, res) => {
