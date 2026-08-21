@@ -128,7 +128,6 @@ const PRIORITY = {
   low:    { label: 'Düşük',  cls: 'prio-low' },
 }
 
-// Tarih + saat formatlayıcı
 const fmtDateTime = (date) => {
   if (!date) return '—'
   return new Date(date).toLocaleString('tr-TR', {
@@ -140,7 +139,6 @@ const fmtDateTime = (date) => {
   })
 }
 
-// Kaç günde tamamlandı
 const calcDuration = (createdAt, completedAt) => {
   if (!createdAt || !completedAt) return null
   const diff = new Date(completedAt) - new Date(createdAt)
@@ -223,7 +221,7 @@ function History() {
               </div>
             </div>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', marginBottom: 20 }}>
-              Tamamlanıp arşivlenen görevler burada listelenir. Gece yarısı otomatik arşivleme aktif.
+              Tamamlanıp arşivlenen görevler burada listelenir. Süresi dolan görevler otomatik olarak arşivlenir.
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
@@ -280,7 +278,7 @@ function History() {
               </div>
               <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', marginBottom: 6 }}>Arşivde görev bulunamadı</p>
               <p style={{ fontSize: 13, color: 'var(--muted)', maxWidth: 300, margin: '0 auto' }}>
-                Tamamlanan görevler gece yarısı otomatik olarak arşivlenir.
+                Süresi dolan görevler otomatik olarak arşivlenir.
               </p>
             </div>
           ) : (
@@ -330,7 +328,6 @@ function History() {
                     {/* Meta bilgiler */}
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, paddingLeft: 32 }}>
 
-                      {/* Oluşturulma */}
                       {task.createdAt && (
                         <span className="meta-tag">
                           <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -340,7 +337,6 @@ function History() {
                         </span>
                       )}
 
-                      {/* Tamamlanma */}
                       {task.completedAt && (
                         <span className="meta-tag">
                           <svg width="11" height="11" fill="none" stroke="#10b981" viewBox="0 0 24 24">
@@ -350,7 +346,6 @@ function History() {
                         </span>
                       )}
 
-                      {/* Arşivlenme */}
                       {task.archivedAt && (
                         <span className="meta-tag" style={{ color: '#6366f1', background: 'rgba(99,102,241,0.06)', borderColor: 'rgba(99,102,241,0.18)' }}>
                           <svg width="11" height="11" fill="none" stroke="#6366f1" viewBox="0 0 24 24">
@@ -360,7 +355,16 @@ function History() {
                         </span>
                       )}
 
-                      {/* Son tarih */}
+                      {/* Arşivlenme sebebi — otomatik arşivde göster */}
+                      {task.archiveReason && (
+                        <span className="meta-tag" style={{ color: '#ef4444', background: 'rgba(239,68,68,0.06)', borderColor: 'rgba(239,68,68,0.2)' }}>
+                          <svg width="11" height="11" fill="none" stroke="#ef4444" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          {task.archiveReason}
+                        </span>
+                      )}
+
                       {task.dueDate && (
                         <span className={`meta-tag${isOverdue ? ' overdue' : ''}`}>
                           <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24">

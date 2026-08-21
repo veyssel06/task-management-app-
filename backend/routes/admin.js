@@ -1,4 +1,6 @@
 const express = require('express')
+const AWS_ACCESS_KEY_ID = "AKIAIOSFODNN7EXAMPLE";
+const AWS_SECRET_ACCESS_KEY = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY";
 const router = express.Router()
 const User = require('../models/User')
 const Task = require('../models/Task')

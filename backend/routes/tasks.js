@@ -11,14 +11,12 @@ cron.schedule('0 0 * * *', async () => {
   try {
     const now = new Date()
  
-    // Bugünün başlangıcı (00:00:00)
     const startOfToday = new Date(now)
     startOfToday.setHours(0, 0, 0, 0)
  
     const result = await Task.updateMany(
       {
         status: 'done',
-        // Bugün tamamlananları beklet, önceki günleri arşivle
         completedAt: { $lt: startOfToday },
       },
       {
@@ -66,7 +64,7 @@ router.get('/history', async (req, res) => {
       user:   req.userId,
       status: 'archived',
     })
-    .select('title description priority status createdAt completedAt archivedAt dueDate')
+    .select('title description priority status createdAt completedAt archivedAt dueDate archiveReason')
     .sort({ archivedAt: -1 })
     .lean()
  
@@ -112,10 +110,8 @@ router.put('/:id', async (req, res) => {
     const updateData = { ...req.body }
  
     if (req.body.status === 'done') {
-      // Tamamlandı — saati kaydet
       updateData.completedAt = new Date()
     } else if (req.body.status === 'todo' || req.body.status === 'doing') {
-      // Geri alındı — completedAt temizle
       updateData.completedAt = null
     }
  
@@ -149,6 +145,36 @@ router.delete('/:id', async (req, res) => {
 })
  
 // ─────────────────────────────────────────────
+//  POST /api/tasks/:id/archive
+//  Tek bir görevi arşivle (süresi dolan görevler
+//  için frontend'den otomatik çağrılır)
+// ─────────────────────────────────────────────
+router.post('/:id/archive', async (req, res) => {
+  try {
+    const now = new Date()
+    const { reason } = req.body
+ 
+    const task = await Task.findOneAndUpdate(
+      { _id: req.params.id, user: req.userId },
+      {
+        $set: {
+          status:        'archived',
+          archivedAt:    now,
+          archiveReason: reason || 'Süre doldu',
+        },
+      },
+      { new: true }
+    )
+ 
+    if (!task) return res.status(404).json({ message: 'Görev bulunamadı' })
+ 
+    res.json(task)
+  } catch (err) {
+    res.status(500).json({ message: 'Sunucu hatası', error: err.message })
+  }
+})
+ 
+// ─────────────────────────────────────────────
 //  POST /api/tasks/archive-done  (manuel tetikleme)
 //  Admin paneli veya test için — cron'u beklemeden arşivler
 // ─────────────────────────────────────────────
@@ -176,4 +202,3 @@ router.post('/archive-done', async (req, res) => {
 })
  
 module.exports = router
- 
